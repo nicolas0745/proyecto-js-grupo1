@@ -4,8 +4,8 @@
   "description": "",
   "homepage": "https://nicolas0745.github.io/proyecto-js-grupo1",
   "scripts": {
-    "start": "parcel src/*.html",
-    "build": "parcel build src/*.html --public-url /proyecto-js-grupo1/"
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html --public-url /proyecto-js-grupo1/"
   },
   "repository": {
     "type": "git",
