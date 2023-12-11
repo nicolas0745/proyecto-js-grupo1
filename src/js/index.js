@@ -1,5 +1,6 @@
 import { getTrending, fetchBySearch, fetchById } from './fetch-functions';
 import { renderMovies, enableModal } from './functions';
+const gallery = document.querySelector('.gallery');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.dot-spinner');
@@ -15,30 +16,27 @@ const getTrendingMovies = async () => {
   renderMovies(movies);
   loader.classList.toggle('hidden');
 
-  enableModal();
+  enableModal(false);
+
   // (() => {
   //   const refs = {
-  //     openModalBtn: document.querySelectorAll(".data-modal-open"),
-  //     closeModalBtn: document.querySelector("[data-modal-close]"),
-  //     modal: document.querySelector("[data-modal]"),
+  //     openModalBtn: document.querySelectorAll('.data-modal-open'),
+  //     closeModalBtn: document.querySelector('[data-modal-close]'),
+  //     modal: document.querySelector('[data-modal]'),
   //   };
 
   //   refs.openModalBtn.forEach(element => {
-  //     element.addEventListener("click", toggleModal);
-
+  //     element.addEventListener('click', toggleModal);
   //   });
-  //   refs.closeModalBtn.addEventListener("click", toggleModal);
+  //   refs.closeModalBtn.addEventListener('click', toggleModal);
 
   //   function toggleModal() {
-  //     refs.modal.classList.toggle("is-hidden");
+  //     refs.modal.classList.toggle('is-hidden');
   //   }
-
   // })();
-
   gallery.addEventListener('click', e => {
     let movieId = e.target.id;
     //tenemos el id de la imagen seleccionada
-
     fetchMovieById(movieId);
   });
 };
@@ -53,13 +51,19 @@ btnSubmit.addEventListener('click', async e => {
   if (data == undefined) return;
   const { results: movies, total_pages } = data;
   renderMovies(movies);
-  console.log(total_pages);
+  enableModal(true);
+  // console.log(total_pages);
   loader.classList.toggle('hidden');
+  gallery.addEventListener('click', e => {
+    let movieId = e.target.id;
+    //tenemos el id de la imagen seleccionada
+    fetchMovieById(movieId);
+  });
 });
 
 const fetchMovieById = async id => {
   const data = await fetchById(id);
-  console.log(data);
+  // console.log(data);
 
   const movieTitle = document.querySelector('.modal-title');
   movieTitle.textContent = data.original_title.toUpperCase();
@@ -81,7 +85,3 @@ const fetchMovieById = async id => {
 };
 
 getTrendingMovies();
-
-// searchMovies('mario');
-
-// const gallery = document.querySelector('.gallery')

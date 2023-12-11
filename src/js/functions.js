@@ -49,7 +49,7 @@ export function renderMovies(movies) {
     else imgSrcr = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
     let titleUppercase = movie.title.toUpperCase();
     htmlcode += `<div class="photo-card">
-                                  <img class="galleryimage" src="${imgSrcr}" alt="${movies[0].title}" loading="lazy" />
+                                  <img class="galleryimage data-modal-open" id="${movie.id}"src="${imgSrcr}" alt="${movies[0].title}" loading="lazy" />
                                   <div class="info">
                                     <p class="info-item"> 
                                       <b>${titleUppercase}</b>
@@ -61,4 +61,23 @@ export function renderMovies(movies) {
                                </div>`;
   });
   gallery.innerHTML = htmlcode;
+}
+
+export function enableModal(param) {
+  const refs = {
+    openModalBtn: document.querySelectorAll('.data-modal-open'),
+    closeModalBtn: document.querySelector('[data-modal-close]'),
+    modal: document.querySelector('[data-modal]'),
+  };
+
+  refs.openModalBtn.forEach(element => {
+    element.addEventListener('click', toggleModal);
+  });
+  if (!param) {
+    refs.closeModalBtn.addEventListener('click', toggleModal);
+  }
+
+  function toggleModal() {
+    refs.modal.classList.toggle('is-hidden');
+  }
 }
