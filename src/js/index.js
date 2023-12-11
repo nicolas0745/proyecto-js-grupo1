@@ -51,7 +51,7 @@ const getTrendingMovies = async () => {
     let genreText = findGender(movie.genre_ids)
     let titleUppercase = movie.title.toUpperCase()
     gallery.innerHTML += `<div class="photo-card">
-                              <img class="galleryimage" src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movies[0].title}" loading="lazy" />
+                              <img class="galleryimage data-modal-open" src="https://image.tmdb.org/t/p/w500${movie.poster_path}" id="${movie.id}" alt="${movie.title}" loading="lazy" />
                               <div class="info">
                                 <p class="info-item"> 
                                   <b>${titleUppercase}</b>
@@ -63,6 +63,37 @@ const getTrendingMovies = async () => {
                            </div>`
   
   });
+
+  (() => {
+    const refs = {
+      openModalBtn: document.querySelectorAll(".data-modal-open"),
+      closeModalBtn: document.querySelector("[data-modal-close]"),
+      modal: document.querySelector("[data-modal]"),
+    };
+    
+    refs.openModalBtn.forEach(element => {
+      element.addEventListener("click", toggleModal);
+      
+    });
+    refs.closeModalBtn.addEventListener("click", toggleModal);
+
+    function toggleModal() {
+      refs.modal.classList.toggle("is-hidden");
+    }
+    
+  })();
+  
+  gallery.addEventListener('click', (e) => { 
+  let movieId = e.target.id
+    //tenemos el id de la imagen seleccionada
+    
+    fetchMovieById(movieId); 
+    
+})
+
+
+
+
 };
 
 const searchMovies = async query => {
@@ -75,29 +106,31 @@ const searchMovies = async query => {
 
 const fetchMovieById = async id => {
   const data = await fetchById(id);
-  //console.log(data);
+  console.log(data);
+
+  const movieTitle = document.querySelector('.modal-title')
+  movieTitle.textContent = data.original_title.toUpperCase()
+  const results = document.querySelector('.results')
+  const review = document.querySelector('.abouttext')
+  const imgModal = document.querySelector('.img-modal')
+
+  let movieGen = []
+  data.genres.forEach(element => {
+    movieGen.push(' '+element.name)
+  });
+  results.innerHTML = `<li><span class="span">${data.vote_average}</span> / ${data.vote_count}</li>
+                                    <li>${data.popularity}</li>
+                                    <li>${data.original_title}</li>
+                                    <li>${movieGen}</li>`
+  
+  review.textContent = data.overview
+  imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`
+
 };
 
 getTrendingMovies();
 searchMovies('mario');
-fetchMovieById(1209403);
+
 
 const gallery = document.querySelector('.gallery')
 
-
-/* function markUP(searchData) { 
-  searchData.forEach(element => {
-    gallery.innerHTML += `<div class="photo-card">
-                            <a class="galleryitem" href=""> <img class="galleryimage" src="${}" alt="${}" loading="lazy" /></a>
-                            <div class="info">
-                              <p class="info-item"> 
-                                <p><b>GREYHOUND</b></p>
-                              </p>
-                              <p class="info-item">
-                                <p><b>Drama, Action | 2020</b></p>
-                              </p>
-                           </div>
-                         </div>`
-  }) ; 
- 
-} */
