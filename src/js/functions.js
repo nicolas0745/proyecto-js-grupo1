@@ -21,9 +21,9 @@ const moviesGenre = [
   { number: 37, genre: 'Western' },
 ];
 
-// funcion para encontrar los generos de una oelicula
+// funcion para encontrar los generos de una pelicula
 
-function findGender(data) {
+export function findGender(data) {
   const genreArray = [];
   data.forEach(elementData => {
     moviesGenre.forEach(elementGenre => {
@@ -35,13 +35,13 @@ function findGender(data) {
   return genreArray;
 }
 
-// Funcion para renderizar las pelicuñas en gallery
+// Funcion para renderizar las peliculas en gallery
 
 export function renderMovies(movies) {
   let htmlcode = '';
   let imgSrcr = '';
   movies.forEach(movie => {
-    console.log(movie);
+    // console.log(movie);
     let year = movie.release_date.substr(0, 4);
     let genreText = findGender(movie.genre_ids);
     if (movie.poster_path == null)
@@ -49,7 +49,7 @@ export function renderMovies(movies) {
     else imgSrcr = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
     let titleUppercase = movie.title.toUpperCase();
     htmlcode += `<div class="photo-card">
-                                  <img class="galleryimage data-modal-open" id="${movie.id}"src="${imgSrcr}" alt="${movies[0].title}" loading="lazy" />
+                                  <img class="galleryimage data-modal-open" id="${movie.id}"src="${imgSrcr}" alt="${movie.title}" loading="lazy" />
                                   <div class="info">
                                     <p class="info-item"> 
                                       <b>${titleUppercase}</b>

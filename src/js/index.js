@@ -1,12 +1,21 @@
 import { getTrending, fetchBySearch, fetchById } from './fetch-functions';
-import { renderMovies, enableModal } from './functions';
+import { renderMovies, enableModal, findGender } from './functions';
 const gallery = document.querySelector('.gallery');
+const btnWatch = document.querySelector('.watch');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.dot-spinner');
 let page = 1;
 let pageSearch = 1;
+console.log(JSON.parse(localStorage.getItem('movies')));
 
+const dataToSave = {
+  release_date: '',
+  genre_ids: '',
+  poster_path: '',
+  title: '',
+  id: '',
+};
 const getTrendingMovies = async () => {
   loader.classList.toggle('hidden');
   const data = await getTrending(page);
@@ -44,8 +53,7 @@ const getTrendingMovies = async () => {
 btnSubmit.addEventListener('click', async e => {
   e.preventDefault();
   loader.classList.toggle('hidden');
-  const string = inputSearch.value;
-  string.trim();
+  const string = inputSearch.value.trim();
   console.log(string);
   const data = await fetchBySearch(string, pageSearch);
   if (data == undefined) return;
@@ -63,8 +71,16 @@ btnSubmit.addEventListener('click', async e => {
 
 const fetchMovieById = async id => {
   const data = await fetchById(id);
+  if (data == undefined) return;
   // console.log(data);
+  // console.log(data.genres);
+  dataToSave.release_date = data.release_date;
+  dataToSave.genre_ids = data.genres.map(data => data.id);
 
+  console.log(dataToSave.genre_ids);
+  dataToSave.id = id;
+  dataToSave.poster_path = data.poster_path;
+  dataToSave.title = data.title;
   const movieTitle = document.querySelector('.modal-title');
   movieTitle.textContent = data.original_title.toUpperCase();
   const results = document.querySelector('.results');
@@ -83,5 +99,17 @@ const fetchMovieById = async id => {
   review.textContent = data.overview;
   imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
 };
+
+btnWatch.addEventListener('click', () => {
+  const getMovies = JSON.parse(localStorage.getItem('movies'));
+  if (getMovies == null) {
+    localStorage.setItem('movies', JSON.stringify([dataToSave]));
+    return;
+  }
+  getMovies.push(dataToSave);
+  localStorage.setItem('movies', JSON.stringify(getMovies));
+  console.log(getMovies, 'movies');
+});
+const addToLocalStorage = data => {};
 
 getTrendingMovies();
