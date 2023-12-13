@@ -4,6 +4,10 @@ const gallery = document.querySelector('.gallery');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.dot-spinner');
+
+
+
+
 let page = 1;
 let pageSearch = 1;
 
@@ -36,9 +40,16 @@ const getTrendingMovies = async () => {
   // })();
   gallery.addEventListener('click', e => {
     let movieId = e.target.id;
+    
     //tenemos el id de la imagen seleccionada
+    if (movieId != '') { 
     fetchMovieById(movieId);
+    } 
+      
   });
+
+  
+  
 };
 
 btnSubmit.addEventListener('click', async e => {
@@ -46,7 +57,7 @@ btnSubmit.addEventListener('click', async e => {
   loader.classList.toggle('hidden');
   const string = inputSearch.value;
   string.trim();
-  console.log(string);
+  //console.log(string);
   const data = await fetchBySearch(string, pageSearch);
   if (data == undefined) return;
   const { results: movies, total_pages } = data;

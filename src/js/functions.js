@@ -41,7 +41,7 @@ export function renderMovies(movies) {
   let htmlcode = '';
   let imgSrcr = '';
   movies.forEach(movie => {
-    console.log(movie);
+    //console.log(movie);
     let year = movie.release_date.substr(0, 4);
     let genreText = findGender(movie.genre_ids);
     if (movie.poster_path == null)
@@ -62,7 +62,7 @@ export function renderMovies(movies) {
   });
   gallery.innerHTML = htmlcode;
 }
-
+const body = document.querySelector('body')
 export function enableModal(param) {
   const refs = {
     openModalBtn: document.querySelectorAll('.data-modal-open'),
@@ -76,6 +76,15 @@ export function enableModal(param) {
   if (!param) {
     refs.closeModalBtn.addEventListener('click', toggleModal);
   }
+
+  body.addEventListener('keyup', (e) => { 
+    if (e.key == 'Escape') { 
+      refs.modal.classList.toggle('is-hidden');
+      
+    }
+   
+      
+  })
 
   function toggleModal() {
     refs.modal.classList.toggle('is-hidden');
