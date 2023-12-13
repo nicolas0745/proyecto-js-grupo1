@@ -77,10 +77,10 @@ export function enableModal(param) {
     refs.closeModalBtn.addEventListener('click', toggleModal);
   }
 
+
   body.addEventListener('keyup', (e) => { 
     if (e.key == 'Escape') { 
-      refs.modal.classList.toggle('is-hidden');
-      
+      refs.modal.classList.add('is-hidden');
     }
    
       
