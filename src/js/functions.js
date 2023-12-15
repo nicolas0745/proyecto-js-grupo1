@@ -85,6 +85,11 @@ export function enableModal(param) {
     if (e.key == 'Escape') {
       refs.modal.classList.add('is-hidden');
     }
+    // });
+  });
+  const cierre = document.querySelector('.svg-cierre');
+  cierre.addEventListener('click', e => {
+    refs.modal.classList.add('is-hidden');
   });
 
   function toggleModal() {

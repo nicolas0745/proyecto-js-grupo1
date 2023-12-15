@@ -5,6 +5,9 @@ import {
   fetchMovieById,
   btnWatched,
 } from './functions';
+import { renderMovies, enableModal } from './functions';
+
+localStorage.removeItem('total-results-from-search');
 const gallery = document.querySelector('.gallery');
 const btnWatch = document.querySelector('.watch');
 const btnSubmit = document.querySelector('.btn');
@@ -12,8 +15,12 @@ const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.spiner-cont');
 let movieId = 0;
 
-let page = 1;
-let pageSearch = 1;
+export let selectedBySearch = 0;
+export let string = '';
+
+let totalPageSearch = 0;
+// let page = 1;
+//let pageSearch = 1;
 console.log(JSON.parse(localStorage.getItem('movies')));
 
 const getTrendingMovies = async () => {
@@ -24,7 +31,6 @@ const getTrendingMovies = async () => {
 
   renderMovies(movies);
   loader.classList.toggle('hidden');
-
   enableModal(false);
 
   gallery.addEventListener('click', e => {
@@ -40,21 +46,62 @@ const getTrendingMovies = async () => {
 btnSubmit.addEventListener('click', async e => {
   e.preventDefault();
   loader.classList.toggle('hidden');
-  const string = inputSearch.value.trim();
-  console.log(string);
+  // const string = inputSearch.value.trim();
+  // console.log(string);
   const data = await fetchBySearch(string, pageSearch);
   if (data == undefined) {
     loader.classList.toggle('hidden');
     return;
   }
   const { results: movies, total_pages } = data;
+  string = inputSearch.value;
+
+  // string.trim();
+  //console.log(string);
+  // const data = await fetchBySearch(string, pageSearch);
+  // if (data == undefined) return;
+  // const { results: movies, total_page } = data;
+  // console.log(data)
+  totalPageSearch = data.total_results;
+  const pageString = JSON.stringify(totalPageSearch); //convierto en string
+  localStorage.setItem('total-results-from-search', pageString);
+
   renderMovies(movies);
   enableModal(true);
   loader.classList.toggle('hidden');
+  selectedBySearch = 1;
+  // console.log(selectedBySearch)
+  gallery.addEventListener('click', e => {
+    let movieId = e.target.id;
+    //tenemos el id de la imagen seleccionada
+    if (movieId != '') {
+      fetchMovieById(movieId);
+    }
+  });
 });
 
 btnWatch.addEventListener('click', () => {
   btnWatched(movieId);
 });
+
+// getTrendingMovies();
+//   const movieTitle = document.querySelector('.modal-title');
+//   movieTitle.textContent = data.original_title.toUpperCase();
+//   const results = document.querySelector('.results');
+//   const review = document.querySelector('.abouttext');
+//   const imgModal = document.querySelector('.img-modal');
+
+//   let movieGen = [];
+//   data.genres.forEach(element => {
+//     movieGen.push(' ' + element.name);
+//   });
+//   results.innerHTML = `<li><span class="span">${data.vote_average}</span> / ${data.vote_count}</li>
+//                                     <li>${data.popularity}</li>
+//                                     <li>${data.original_title}</li>
+//                                     <li>${movieGen}</li>`;
+
+//   review.textContent = data.overview;
+//   imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
+// };
 
 getTrendingMovies();
