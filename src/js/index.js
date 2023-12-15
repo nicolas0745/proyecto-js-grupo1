@@ -1,43 +1,30 @@
 import { getTrending, fetchBySearch, fetchById } from './fetch-functions';
 import { renderMovies, enableModal } from './functions';
+
+
+localStorage.removeItem("total-results-from-search");
 const gallery = document.querySelector('.gallery');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.dot-spinner');
+export let selectedBySearch = 0;
+export let string = '';
 
-
-
-
+let totalPageSearch = 0
 let page = 1;
 let pageSearch = 1;
 
 const getTrendingMovies = async () => {
+ 
   loader.classList.toggle('hidden');
   const data = await getTrending(page);
   if (data == undefined) return;
   const { results: movies, total_pages } = data;
-
+  
   renderMovies(movies);
   loader.classList.toggle('hidden');
-
   enableModal(false);
 
-  // (() => {
-  //   const refs = {
-  //     openModalBtn: document.querySelectorAll('.data-modal-open'),
-  //     closeModalBtn: document.querySelector('[data-modal-close]'),
-  //     modal: document.querySelector('[data-modal]'),
-  //   };
-
-  //   refs.openModalBtn.forEach(element => {
-  //     element.addEventListener('click', toggleModal);
-  //   });
-  //   refs.closeModalBtn.addEventListener('click', toggleModal);
-
-  //   function toggleModal() {
-  //     refs.modal.classList.toggle('is-hidden');
-  //   }
-  // })();
   gallery.addEventListener('click', e => {
     let movieId = e.target.id;
     
@@ -55,21 +42,33 @@ const getTrendingMovies = async () => {
 btnSubmit.addEventListener('click', async e => {
   e.preventDefault();
   loader.classList.toggle('hidden');
-  const string = inputSearch.value;
+  string = inputSearch.value;
+  
   string.trim();
   //console.log(string);
   const data = await fetchBySearch(string, pageSearch);
   if (data == undefined) return;
-  const { results: movies, total_pages } = data;
+  const { results: movies, total_page } = data;
+  console.log(data)
+  totalPageSearch = data.total_results
+  const pageString = JSON.stringify(totalPageSearch)//convierto en string
+  localStorage.setItem('total-results-from-search', pageString)
+  
   renderMovies(movies);
   enableModal(true);
   // console.log(total_pages);
   loader.classList.toggle('hidden');
+  selectedBySearch = 1;
+  console.log(selectedBySearch)
   gallery.addEventListener('click', e => {
     let movieId = e.target.id;
     //tenemos el id de la imagen seleccionada
+    if (movieId != '') { 
     fetchMovieById(movieId);
+    } 
+    
   });
+  
 });
 
 const fetchMovieById = async id => {
@@ -96,3 +95,5 @@ const fetchMovieById = async id => {
 };
 
 getTrendingMovies();
+
+
