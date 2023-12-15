@@ -1,4 +1,7 @@
+import { fetchById } from './fetch-functions';
+const btnWatch = document.querySelector('.watch');
 const gallery = document.querySelector('.gallery');
+
 const moviesGenre = [
   { number: 28, genre: 'Action' },
   { number: 12, genre: 'Adventure' },
@@ -62,7 +65,7 @@ export function renderMovies(movies) {
   });
   gallery.innerHTML = htmlcode;
 }
-
+const body = document.querySelector('body');
 export function enableModal(param) {
   const refs = {
     openModalBtn: document.querySelectorAll('.data-modal-open'),
@@ -75,9 +78,101 @@ export function enableModal(param) {
   });
   if (!param) {
     refs.closeModalBtn.addEventListener('click', toggleModal);
+    console.log('agrega listenner');
   }
+
+  body.addEventListener('keyup', e => {
+    if (e.key == 'Escape') {
+      refs.modal.classList.add('is-hidden');
+    }
+  });
 
   function toggleModal() {
     refs.modal.classList.toggle('is-hidden');
+  }
+}
+
+export const fetchMovieById = async id => {
+  const spinerCont = document.querySelector('.spiner-container');
+  spinerCont.classList.toggle('hidden');
+  console.log('enable modal');
+  const data = await fetchById(id);
+  if (data == undefined) return;
+  let isWatched = false;
+  const getMovies = JSON.parse(localStorage.getItem('movies'));
+  if (getMovies !== null) {
+    getMovies.forEach(movie => {
+      if (movie.id == id) {
+        isWatched = true;
+      }
+    });
+  }
+  const movieTitle = document.querySelector('.modal-title');
+  movieTitle.textContent = data.original_title.toUpperCase();
+  const results = document.querySelector('.results');
+  const review = document.querySelector('.abouttext');
+  const imgModal = document.querySelector('.img-modal');
+
+  let movieGen = [];
+  data.genres.forEach(element => {
+    movieGen.push(' ' + element.name);
+  });
+  results.innerHTML = `<li><span class="span">${data.vote_average}</span> / ${data.vote_count}</li>
+                                    <li>${data.popularity}</li>
+                                    <li>${data.original_title}</li>
+                                    <li>${movieGen}</li>`;
+
+  review.textContent = data.overview;
+  imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
+  if (isWatched) {
+    btnWatch.textContent = 'Remove';
+    btnWatch.classList.add('watched');
+    spinerCont.classList.toggle('hidden');
+    return;
+  }
+  btnWatch.textContent = 'add to watched';
+  if (btnWatch.classList.contains('watched'))
+    btnWatch.classList.remove('watched');
+  spinerCont.classList.toggle('hidden');
+};
+
+export async function btnWatched(movieId) {
+  console.log(movieId);
+  if (movieId == 0) return;
+  const dataToSave = {};
+  const data = await fetchById(movieId);
+  if (data == undefined) return;
+  dataToSave.release_date = data.release_date;
+  dataToSave.genre_ids = data.genres.map(data => data.id);
+
+  console.log(dataToSave.genre_ids);
+  dataToSave.id = movieId;
+  dataToSave.poster_path = data.poster_path;
+  dataToSave.title = data.title;
+
+  const getMovies = JSON.parse(localStorage.getItem('movies'));
+
+  let isInLocalStorage = false;
+  if (getMovies == null) {
+    localStorage.setItem('movies', JSON.stringify([dataToSave]));
+    btnWatch.textContent = 'Remove';
+    btnWatch.classList.add('watched');
+    return;
+  }
+  getMovies.forEach(movie => {
+    if (movie.id == dataToSave.id) {
+      isInLocalStorage = true;
+      let index = getMovies.findIndex(elem => elem.id == dataToSave.id);
+      getMovies.splice(index, 1);
+      localStorage.setItem('movies', JSON.stringify(getMovies));
+      btnWatch.textContent = 'add to watched';
+      btnWatch.classList.remove('watched');
+    }
+  });
+  if (!isInLocalStorage) {
+    getMovies.push(dataToSave);
+    localStorage.setItem('movies', JSON.stringify(getMovies));
+    btnWatch.textContent = 'Remove';
+    btnWatch.classList.add('watched');
   }
 }
