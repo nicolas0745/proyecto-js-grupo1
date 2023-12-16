@@ -1,4 +1,7 @@
+import { fetchById } from './fetch-functions';
+const btnWatch = document.querySelector('.watch');
 const gallery = document.querySelector('.gallery');
+
 const moviesGenre = [
   { number: 28, genre: 'Action' },
   { number: 12, genre: 'Adventure' },
@@ -21,9 +24,9 @@ const moviesGenre = [
   { number: 37, genre: 'Western' },
 ];
 
-// funcion para encontrar los generos de una oelicula
+// funcion para encontrar los generos de una pelicula
 
-function findGender(data) {
+export function findGender(data) {
   const genreArray = [];
   data.forEach(elementData => {
     moviesGenre.forEach(elementGenre => {
@@ -35,13 +38,13 @@ function findGender(data) {
   return genreArray;
 }
 
-// Funcion para renderizar las pelicuñas en gallery
+// Funcion para renderizar las peliculas en gallery
 
 export function renderMovies(movies) {
   let htmlcode = '';
   let imgSrcr = '';
   movies.forEach(movie => {
-    //console.log(movie);
+    // console.log(movie);
     let year = movie.release_date.substr(0, 4);
     let genreText = findGender(movie.genre_ids);
     if (movie.poster_path == null)
@@ -49,7 +52,7 @@ export function renderMovies(movies) {
     else imgSrcr = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
     let titleUppercase = movie.title.toUpperCase();
     htmlcode += `<div class="photo-card">
-                                  <img class="galleryimage data-modal-open" id="${movie.id}"src="${imgSrcr}" alt="${movies[0].title}" loading="lazy" />
+                                  <img class="galleryimage data-modal-open" id="${movie.id}"src="${imgSrcr}" alt="${movie.title}" loading="lazy" />
                                   <div class="info">
                                     <p class="info-item"> 
                                       <b>${titleUppercase}</b>
@@ -62,7 +65,7 @@ export function renderMovies(movies) {
   });
   gallery.innerHTML = htmlcode;
 }
-const body = document.querySelector('body')
+const body = document.querySelector('body');
 export function enableModal(param) {
   const refs = {
     openModalBtn: document.querySelectorAll('.data-modal-open'),
@@ -75,23 +78,106 @@ export function enableModal(param) {
   });
   if (!param) {
     refs.closeModalBtn.addEventListener('click', toggleModal);
+    console.log('agrega listenner');
   }
 
-
-  body.addEventListener('keyup', (e) => { 
-    if (e.key == 'Escape') { 
+  body.addEventListener('keyup', e => {
+    if (e.key == 'Escape') {
       refs.modal.classList.add('is-hidden');
     }
-  })
-  const cierre = document.querySelector('.svg-cierre')
-   cierre.addEventListener('click', (e) => { 
-    
-      refs.modal.classList.add('is-hidden');
-    
-  })
-
+    // });
+  });
+  const cierre = document.querySelector('.svg-cierre');
+  cierre.addEventListener('click', e => {
+    refs.modal.classList.add('is-hidden');
+  });
 
   function toggleModal() {
     refs.modal.classList.toggle('is-hidden');
+  }
+}
+
+export const fetchMovieById = async id => {
+  const spinerCont = document.querySelector('.spiner-container');
+  spinerCont.classList.toggle('hidden');
+  console.log('enable modal');
+  const data = await fetchById(id);
+  if (data == undefined) return;
+  let isWatched = false;
+  const getMovies = JSON.parse(localStorage.getItem('movies'));
+  if (getMovies !== null) {
+    getMovies.forEach(movie => {
+      if (movie.id == id) {
+        isWatched = true;
+      }
+    });
+  }
+  const movieTitle = document.querySelector('.modal-title');
+  movieTitle.textContent = data.original_title.toUpperCase();
+  const results = document.querySelector('.results');
+  const review = document.querySelector('.abouttext');
+  const imgModal = document.querySelector('.img-modal');
+
+  let movieGen = [];
+  data.genres.forEach(element => {
+    movieGen.push(' ' + element.name);
+  });
+  results.innerHTML = `<li><span class="span">${data.vote_average}</span> / ${data.vote_count}</li>
+                                    <li>${data.popularity}</li>
+                                    <li>${data.original_title}</li>
+                                    <li>${movieGen}</li>`;
+
+  review.textContent = data.overview;
+  imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
+  if (isWatched) {
+    btnWatch.textContent = 'Remove';
+    btnWatch.classList.add('watched');
+    spinerCont.classList.toggle('hidden');
+    return;
+  }
+  btnWatch.textContent = 'add to watched';
+  if (btnWatch.classList.contains('watched'))
+    btnWatch.classList.remove('watched');
+  spinerCont.classList.toggle('hidden');
+};
+
+export async function btnWatched(movieId) {
+  console.log(movieId);
+  if (movieId == 0) return;
+  const dataToSave = {};
+  const data = await fetchById(movieId);
+  if (data == undefined) return;
+  dataToSave.release_date = data.release_date;
+  dataToSave.genre_ids = data.genres.map(data => data.id);
+
+  console.log(dataToSave.genre_ids);
+  dataToSave.id = movieId;
+  dataToSave.poster_path = data.poster_path;
+  dataToSave.title = data.title;
+
+  const getMovies = JSON.parse(localStorage.getItem('movies'));
+
+  let isInLocalStorage = false;
+  if (getMovies == null) {
+    localStorage.setItem('movies', JSON.stringify([dataToSave]));
+    btnWatch.textContent = 'Remove';
+    btnWatch.classList.add('watched');
+    return;
+  }
+  getMovies.forEach(movie => {
+    if (movie.id == dataToSave.id) {
+      isInLocalStorage = true;
+      let index = getMovies.findIndex(elem => elem.id == dataToSave.id);
+      getMovies.splice(index, 1);
+      localStorage.setItem('movies', JSON.stringify(getMovies));
+      btnWatch.textContent = 'add to watched';
+      btnWatch.classList.remove('watched');
+    }
+  });
+  if (!isInLocalStorage) {
+    getMovies.push(dataToSave);
+    localStorage.setItem('movies', JSON.stringify(getMovies));
+    btnWatch.textContent = 'Remove';
+    btnWatch.classList.add('watched');
   }
 }
