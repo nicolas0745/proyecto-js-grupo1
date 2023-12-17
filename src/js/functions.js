@@ -1,6 +1,7 @@
 import { fetchById } from './fetch-functions';
 const btnWatch = document.querySelector('.watch');
 const gallery = document.querySelector('.gallery');
+const imgModal = document.querySelector('.img-modal');
 
 const moviesGenre = [
   { number: 28, genre: 'Action' },
@@ -71,26 +72,34 @@ export function enableModal(param) {
     openModalBtn: document.querySelectorAll('.data-modal-open'),
     closeModalBtn: document.querySelector('[data-modal-close]'),
     modal: document.querySelector('[data-modal]'),
+    backdrop: (backdrop = document.querySelector('.backdrop')),
+  };
+  const escKey = e => {
+    if (e.key == 'Escape') {
+      document.removeEventListener('keyup', escKey);
+      toggleModal();
+    }
   };
 
   refs.openModalBtn.forEach(element => {
-    element.addEventListener('click', toggleModal);
+    element.addEventListener('click', e => {
+      toggleModal();
+      document.addEventListener('keyup', escKey);
+    });
+  });
+  refs.backdrop.addEventListener('click', e => {
+    console.log(e.target);
+    if (e.target.classList.contains('backdrop')) {
+      document.removeEventListener('keyup', escKey);
+      toggleModal();
+    }
   });
   if (!param) {
     refs.closeModalBtn.addEventListener('click', toggleModal);
-    console.log('agrega listenner');
   }
 
-  body.addEventListener('keyup', e => {
-    if (e.key == 'Escape') {
-      refs.modal.classList.add('is-hidden');
-    }
-    // });
-  });
   const cierre = document.querySelector('.svg-cierre');
-  cierre.addEventListener('click', e => {
-    refs.modal.classList.add('is-hidden');
-  });
+  cierre.addEventListener('click', toggleModal);
 
   function toggleModal() {
     refs.modal.classList.toggle('is-hidden');
@@ -128,7 +137,7 @@ export const fetchMovieById = async id => {
                                     <li>${movieGen}</li>`;
 
   review.textContent = data.overview;
-  imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
+  imgModal.src = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
   if (isWatched) {
     btnWatch.textContent = 'Remove';
     btnWatch.classList.add('watched');

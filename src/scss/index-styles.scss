@@ -1,11 +1,12 @@
 .gallery-container {
   display: flex;
   justify-content: center;
+  width: 320px;
   max-width: 1024px;
 }
 
 .gallery {
-  width: 1024px;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -49,8 +50,11 @@
 @media screen and (min-width: 768px) {
   .gallery {
     grid-template-columns: 1fr 1fr;
+    place-items: center;
   }
-
+  .gallery-container {
+    width: 768px;
+  }
   .photo-card {
     width: 293px;
     height: 440px;
@@ -67,7 +71,9 @@
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
   }
-
+  .gallery-container {
+    width: 1024px;
+  }
   .photo-card {
     width: 274px;
     height: auto;
