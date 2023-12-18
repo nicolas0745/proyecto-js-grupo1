@@ -3,6 +3,7 @@ import {
   fetchMovieById,
   enableModal,
   btnWatched,
+  escKey,
 } from './functions';
 
 const btnW = document.querySelector('.btn-watched');
@@ -12,7 +13,6 @@ const btnWatchModal = document.querySelector('.watch');
 let movieId = 0;
 
 const renderFavoriteMovies = firstTime => {
-  console.log(firstTime);
   btnW.style.background = 'rgba(255, 107, 8, 1)';
   btnQ.style.background = 'transparent';
 
@@ -23,11 +23,10 @@ const renderFavoriteMovies = firstTime => {
     if (firstTime) {
       enableModal(false);
       gallery.addEventListener('click', e => {
-        movieId = e.target.id;
-        console.log(movieId);
-        //tenemos el id de la imagen seleccionada
-        if (movieId != '') {
+        if (e.target.nodeName == 'IMG') {
+          movieId = e.target.id;
           fetchMovieById(movieId);
+          document.addEventListener('keyup', escKey);
         }
       });
     } else {
@@ -48,7 +47,7 @@ btnW.addEventListener('click', () => {
 });
 btnWatchModal.addEventListener('click', async () => {
   await btnWatched(movieId);
-  renderFavoriteMovies();
+  renderFavoriteMovies(false);
 });
 document.addEventListener('DOMContentLoaded', () => {
   renderFavoriteMovies(true);

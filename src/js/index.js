@@ -4,6 +4,7 @@ import {
   enableModal,
   fetchMovieById,
   btnWatched,
+  escKey,
 } from './functions';
 import { paginationLT } from './pagination-function';
 
@@ -21,7 +22,6 @@ export let string = '';
 let totalPageSearch = 0;
 let page = 1;
 let pageSearch = 1;
-console.log(JSON.parse(localStorage.getItem('movies')));
 
 const getTrendingMovies = async () => {
   loader.classList.toggle('hidden');
@@ -30,17 +30,17 @@ const getTrendingMovies = async () => {
   const { results: movies, total_pages } = data;
 
   renderMovies(movies);
-  loader.classList.toggle('hidden');
   enableModal(false);
 
   gallery.addEventListener('click', e => {
-    movieId = e.target.id;
-
-    //tenemos el id de la imagen seleccionada
-    if (movieId != '') {
+    if (e.target.nodeName == 'IMG') {
+      movieId = e.target.id;
       fetchMovieById(movieId);
+      document.addEventListener('keyup', escKey);
     }
   });
+
+  loader.classList.toggle('hidden');
 };
 
 btnSubmit.addEventListener('click', async e => {

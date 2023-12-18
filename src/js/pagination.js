@@ -1,5 +1,5 @@
 import { getTrending, fetchBySearch, fetchById } from './fetch-functions';
-import { renderMovies, enableModal } from './functions';
+import { renderMovies, enableModal, fetchMovieById } from './functions';
 import { selectedBySearch, string } from './index';
 import { paginationLT } from './pagination-function';
 
@@ -52,20 +52,8 @@ function renderPagination(paginationArray) {
             const data = await getTrending(currentPage);
             if (data == undefined) return;
             const { results: movies, total_pages } = data;
-            //console.log(data)
-
             renderMovies(movies);
-
-            enableModal(false);
-
-            gallery.addEventListener('click', e => {
-              let movieId = e.target.id;
-
-              //tenemos el id de la imagen seleccionada
-              if (movieId != '') {
-                fetchMovieById(movieId);
-              }
-            });
+            enableModal(true);
           };
 
           getTrendingMovies();
@@ -76,52 +64,18 @@ function renderPagination(paginationArray) {
 
           async function renderPage() {
             string.trim();
-            //console.log(string);
             const data = await fetchBySearch(string, currentPage);
             const { results: movies, total_pages } = data;
             renderMovies(movies);
             enableModal(true);
-            gallery.addEventListener('click', e => {
-              let movieId = e.target.id;
-              //tenemos el id de la imagen seleccionada
-              if (movieId != '') {
-                fetchMovieById(movieId);
-              }
-            });
           }
           renderPage();
         }
-
-        const fetchMovieById = async id => {
-          const data = await fetchById(id);
-          // console.log(data);
-
-          const movieTitle = document.querySelector('.modal-title');
-          movieTitle.textContent = data.original_title.toUpperCase();
-          const results = document.querySelector('.results');
-          const review = document.querySelector('.abouttext');
-          const imgModal = document.querySelector('.img-modal');
-
-          let movieGen = [];
-          data.genres.forEach(element => {
-            movieGen.push(' ' + element.name);
-          });
-          results.innerHTML = `<li><span class="span">${data.vote_average}</span> / ${data.vote_count}</li>
-                                    <li>${data.popularity}</li>
-                                    <li>${data.original_title}</li>
-                                    <li>${movieGen}</li>`;
-
-          review.textContent = data.overview;
-          imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
-        };
-
         const paginationResult = paginationLT(totalItems, currentPage);
         renderPagination(paginationResult);
       });
     }
     refs.listado.appendChild(link);
-
-    //console.log(link);
   });
 }
 

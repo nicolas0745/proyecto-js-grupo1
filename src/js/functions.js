@@ -2,6 +2,7 @@ import { fetchById } from './fetch-functions';
 const btnWatch = document.querySelector('.watch');
 const gallery = document.querySelector('.gallery');
 const imgModal = document.querySelector('.img-modal');
+const modal = document.querySelector('[data-modal]');
 
 const moviesGenre = [
   { number: 28, genre: 'Action' },
@@ -45,7 +46,6 @@ export function renderMovies(movies) {
   let htmlcode = '';
   let imgSrcr = '';
   movies.forEach(movie => {
-    // console.log(movie);
     let year = movie.release_date.substr(0, 4);
     let genreText = findGender(movie.genre_ids);
     if (movie.poster_path == null)
@@ -67,49 +67,48 @@ export function renderMovies(movies) {
   gallery.innerHTML = htmlcode;
 }
 const body = document.querySelector('body');
+export const escKey = e => {
+  if (e.key == 'Escape') {
+    closeModal();
+  }
+};
+
+function closeModal() {
+  toggleModal();
+  document.removeEventListener('keyup', escKey);
+}
 export function enableModal(param) {
   const refs = {
     openModalBtn: document.querySelectorAll('.data-modal-open'),
     closeModalBtn: document.querySelector('[data-modal-close]'),
     modal: document.querySelector('[data-modal]'),
-    backdrop: (backdrop = document.querySelector('.backdrop')),
+    backdrop: document.querySelector('.backdrop'),
   };
-  const escKey = e => {
-    if (e.key == 'Escape') {
-      document.removeEventListener('keyup', escKey);
-      toggleModal();
-    }
-  };
-
-  refs.openModalBtn.forEach(element => {
-    element.addEventListener('click', e => {
-      toggleModal();
-      document.addEventListener('keyup', escKey);
-    });
-  });
-  refs.backdrop.addEventListener('click', e => {
-    console.log(e.target);
-    if (e.target.classList.contains('backdrop')) {
-      document.removeEventListener('keyup', escKey);
-      toggleModal();
-    }
-  });
   if (!param) {
-    refs.closeModalBtn.addEventListener('click', toggleModal);
+    refs.closeModalBtn.addEventListener('click', e => {
+      closeModal();
+    });
+    refs.backdrop.addEventListener('click', e => {
+      if (e.target.classList.contains('backdrop')) {
+        closeModal();
+      }
+    });
   }
+}
 
-  const cierre = document.querySelector('.svg-cierre');
-  cierre.addEventListener('click', toggleModal);
-
-  function toggleModal() {
-    refs.modal.classList.toggle('is-hidden');
-  }
+function toggleModal() {
+  modal.classList.toggle('is-hidden');
 }
 
 export const fetchMovieById = async id => {
   const spinerCont = document.querySelector('.spiner-container');
+  const results = document.querySelector('.results');
+  const review = document.querySelector('.abouttext');
+  const imgModal = document.querySelector('.img-modal');
+  const movieTitle = document.querySelector('.modal-title');
   spinerCont.classList.toggle('hidden');
-  console.log('enable modal');
+  imgModal.src = '';
+  toggleModal();
   const data = await fetchById(id);
   if (data == undefined) return;
   let isWatched = false;
@@ -121,11 +120,10 @@ export const fetchMovieById = async id => {
       }
     });
   }
-  const movieTitle = document.querySelector('.modal-title');
   movieTitle.textContent = data.original_title.toUpperCase();
-  const results = document.querySelector('.results');
-  const review = document.querySelector('.abouttext');
-  const imgModal = document.querySelector('.img-modal');
+  // const results = document.querySelector('.results');
+  // const review = document.querySelector('.abouttext');
+  // const imgModal = document.querySelector('.img-modal');
 
   let movieGen = [];
   data.genres.forEach(element => {
@@ -151,7 +149,6 @@ export const fetchMovieById = async id => {
 };
 
 export async function btnWatched(movieId) {
-  console.log(movieId);
   if (movieId == 0) return;
   const dataToSave = {};
   const data = await fetchById(movieId);
@@ -159,13 +156,11 @@ export async function btnWatched(movieId) {
   dataToSave.release_date = data.release_date;
   dataToSave.genre_ids = data.genres.map(data => data.id);
 
-  console.log(dataToSave.genre_ids);
   dataToSave.id = movieId;
   dataToSave.poster_path = data.poster_path;
   dataToSave.title = data.title;
 
   const getMovies = JSON.parse(localStorage.getItem('movies'));
-
   let isInLocalStorage = false;
   if (getMovies == null) {
     localStorage.setItem('movies', JSON.stringify([dataToSave]));
