@@ -1,7 +1,8 @@
 import { fetchById } from './fetch-functions';
 const btnWatch = document.querySelector('.watch');
+const btnQueue = document.querySelector('.queue');
 const gallery = document.querySelector('.gallery');
-
+console.log(btnQueue)
 const moviesGenre = [
   { number: 28, genre: 'Action' },
   { number: 12, genre: 'Adventure' },
@@ -49,7 +50,7 @@ export function renderMovies(movies) {
     let genreText = findGender(movie.genre_ids);
     if (movie.poster_path == null)
       imgSrcr = `https://www.shutterstock.com/image-vector/default-image-icon-vector-missing-260nw-2086941550.jpg`;
-    else imgSrcr = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
+    else imgSrcr = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
     let titleUppercase = movie.title.toUpperCase();
     htmlcode += `<div class="photo-card">
                                   <img class="galleryimage data-modal-open" id="${movie.id}"src="${imgSrcr}" alt="${movie.title}" loading="lazy" />
@@ -65,6 +66,7 @@ export function renderMovies(movies) {
   });
   gallery.innerHTML = htmlcode;
 }
+
 const body = document.querySelector('body');
 export function enableModal(param) {
   const refs = {
@@ -98,13 +100,16 @@ export function enableModal(param) {
 }
 
 export const fetchMovieById = async id => {
+  
   const spinerCont = document.querySelector('.spiner-container');
   spinerCont.classList.toggle('hidden');
-  console.log('enable modal');
   const data = await fetchById(id);
   if (data == undefined) return;
   let isWatched = false;
+  let isQueued = false;
   const getMovies = JSON.parse(localStorage.getItem('movies'));
+  const getMoviesQue = JSON.parse(localStorage.getItem('movies-que'));
+  
   if (getMovies !== null) {
     getMovies.forEach(movie => {
       if (movie.id == id) {
@@ -112,11 +117,21 @@ export const fetchMovieById = async id => {
       }
     });
   }
+
+  if (getMoviesQue !== null) {
+    getMoviesQue.forEach(movie => {
+      if (movie.id == id) {
+        isQueued = true;
+      }
+    });
+  }
+  
   const movieTitle = document.querySelector('.modal-title');
   movieTitle.textContent = data.original_title.toUpperCase();
   const results = document.querySelector('.results');
   const review = document.querySelector('.abouttext');
   const imgModal = document.querySelector('.img-modal');
+
 
   let movieGen = [];
   data.genres.forEach(element => {
@@ -128,7 +143,7 @@ export const fetchMovieById = async id => {
                                     <li>${movieGen}</li>`;
 
   review.textContent = data.overview;
-  imgModal.src = `https://image.tmdb.org/t/p/w200${data.poster_path}`;
+  imgModal.src = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
   if (isWatched) {
     btnWatch.textContent = 'Remove';
     btnWatch.classList.add('watched');
@@ -139,24 +154,42 @@ export const fetchMovieById = async id => {
   if (btnWatch.classList.contains('watched'))
     btnWatch.classList.remove('watched');
   spinerCont.classList.toggle('hidden');
+  if (isQueued) {
+    btnQueue.textContent = 'Remove';
+    btnQueue.classList.add('queued-color');
+    spinerCont.classList.toggle('hidden');
+    return;
+  }
+  btnQueue.textContent = 'add to queue';
+  if (btnQueue.classList.contains('queued-color'))
+    btnQueue.classList.remove('queued-color');
+  spinerCont.classList.toggle('hidden');
+
 };
+
+
+
+//-----------------------------------------ok----------------------//
+
 
 export async function btnWatched(movieId) {
   console.log(movieId);
+  
   if (movieId == 0) return;
   const dataToSave = {};
   const data = await fetchById(movieId);
+  
   if (data == undefined) return;
   dataToSave.release_date = data.release_date;
   dataToSave.genre_ids = data.genres.map(data => data.id);
-
+ 
   console.log(dataToSave.genre_ids);
   dataToSave.id = movieId;
   dataToSave.poster_path = data.poster_path;
   dataToSave.title = data.title;
 
   const getMovies = JSON.parse(localStorage.getItem('movies'));
-
+ 
   let isInLocalStorage = false;
   if (getMovies == null) {
     localStorage.setItem('movies', JSON.stringify([dataToSave]));
@@ -179,5 +212,58 @@ export async function btnWatched(movieId) {
     localStorage.setItem('movies', JSON.stringify(getMovies));
     btnWatch.textContent = 'Remove';
     btnWatch.classList.add('watched');
+  }
+}
+
+
+
+//--------------------Boton Q-------------------------
+
+
+
+
+
+
+
+
+export async function btnQueued(movieId) {
+  console.log(movieId);
+  if (movieId == 0) return;
+  const dataToSaveQue = {};
+  const data = await fetchById(movieId);
+  if (data == undefined) return;
+  dataToSaveQue.release_date = data.release_date;
+  dataToSaveQue.genre_ids = data.genres.map(data => data.id);
+
+  console.log(dataToSaveQue.genre_ids);
+  dataToSaveQue.id = movieId;
+  dataToSaveQue.poster_path = data.poster_path;
+  dataToSaveQue.title = data.title;
+
+  const getMoviesQue = JSON.parse(localStorage.getItem('movies-que'));
+
+  let isInLocalStorageQ = false;
+  if (getMoviesQue == null) {
+    localStorage.setItem('movies-que', JSON.stringify([dataToSaveQue]));
+    btnQueue.textContent = 'Remove';
+    btnQueue.classList.add('queued-color');
+    return;
+  }
+  getMoviesQue.forEach(movie => {
+    if (movie.id == dataToSaveQue.id) {
+      isInLocalStorageQ = true;
+      let index2 = getMoviesQue.findIndex(elem => elem.id == dataToSaveQue.id);
+      getMoviesQue.splice(index2, 1);
+      localStorage.setItem('movies-que', JSON.stringify(getMoviesQue));
+      btnQueue.textContent = 'add to queue';
+      btnQueue.classList.remove('queued-color');
+    }
+  });
+  if (!isInLocalStorageQ) {
+    console.log('no estaba en local')
+    getMoviesQue.push(dataToSaveQue);
+    localStorage.setItem('movies-que', JSON.stringify(getMoviesQue));
+    btnQueue.textContent = 'Remove';
+    btnQueue.classList.add('queued-color');
   }
 }
