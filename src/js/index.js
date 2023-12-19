@@ -4,12 +4,15 @@ import {
   enableModal,
   fetchMovieById,
   btnWatched,
+  btnQueued
 } from './functions';
 import { paginationLT } from './pagination-function';
 
-localStorage.removeItem('total-results-from-search');
+
+
 const gallery = document.querySelector('.gallery');
 const btnWatch = document.querySelector('.watch');
+const btnQueue = document.querySelector('.queue');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.spiner-cont');
@@ -21,7 +24,8 @@ export let string = '';
 let totalPageSearch = 0;
 let page = 1;
 let pageSearch = 1;
-console.log(JSON.parse(localStorage.getItem('movies')));
+let moviesCount = JSON.parse(localStorage.getItem('movies'))
+
 
 const getTrendingMovies = async () => {
   loader.classList.toggle('hidden');
@@ -64,6 +68,10 @@ btnSubmit.addEventListener('click', async e => {
 
 btnWatch.addEventListener('click', () => {
   btnWatched(movieId);
+});
+
+btnQueue.addEventListener('click', () => {
+  btnQueued(movieId);
 });
 
 getTrendingMovies();

@@ -115,7 +115,7 @@
   text-transform: uppercase;
 }
 
-.watched {
+.watched, .queued-color {
   background-color: #ff6b01;
   color: #fff;
 }
@@ -124,8 +124,7 @@
   width: 136px;
   height: 44px;
   border-radius: 5px;
-  border: 1px solid #000;
-  color: #000;
+  border: 2px solid #ff6b01;
   text-align: center;
   font-size: 12px;
   font-style: normal;
@@ -134,11 +133,8 @@
   text-transform: uppercase;
 }
 
-.queue:hover {
-  border: 1px solid #ff6b01;
-}
 
-.watch:hover {
+.watch:hover, .queue:hover{
   border: 1px #000;
   cursor: pointer;
 }
