@@ -18,6 +18,7 @@
   margin: 0;
   display: flex;
   justify-content: center;
+  overflow: auto;
 }
 
 .container-box {
@@ -25,7 +26,6 @@
 }
 
 .box-modal {
-  width: 528px;
   height: 581px;
   background-color: rgba(255, 255, 255, 1);
   display: flex;
@@ -36,16 +36,15 @@
   margin-top: 5px;
   margin-right: 5px;
   position: relative;
-  left: 50%;
-  top: -30px;
+  left: 98%;
+  top: -50px;
   @media screen and (min-width: 768px) {
-    left: 110%;
-    top: -30px;
+    top: -45px;
+    left: 99%;
   }
-
   @media screen and (min-width: 1024px) {
-    left: 160%;
-    top: -30px;
+    top: -45px;
+    left: 99%;
   }
 }
 
