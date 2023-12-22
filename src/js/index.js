@@ -1,16 +1,16 @@
-import { getTrending, fetchBySearch, fetchById } from './fetch-functions';
+import { getTrending, fetchBySearch } from './fetch-functions';
 import {
   renderMovies,
   enableModal,
   fetchMovieById,
-  btnWatched,
   escKey,
+  reviewLocalStorage,
 } from './functions';
-import { paginationLT } from './pagination-function';
 
-localStorage.removeItem('total-results-from-search');
+localStorage.removeItem('total-results-from-search'); //en review
 const gallery = document.querySelector('.gallery');
 const btnWatch = document.querySelector('.watch');
+const btnQueue = document.querySelector('.queue');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.spiner-cont');
@@ -63,7 +63,10 @@ btnSubmit.addEventListener('click', async e => {
 });
 
 btnWatch.addEventListener('click', () => {
-  btnWatched(movieId);
+  reviewLocalStorage(movieId, 'watched');
 });
 
+btnQueue.addEventListener('click', () => {
+  reviewLocalStorage(movieId, 'queue');
+});
 getTrendingMovies();

@@ -1,7 +1,7 @@
 import { fetchById } from './fetch-functions';
 const btnWatch = document.querySelector('.watch');
+const btnQueue = document.querySelector('.queue');
 const gallery = document.querySelector('.gallery');
-const imgModal = document.querySelector('.img-modal');
 const modal = document.querySelector('[data-modal]');
 
 const moviesGenre = [
@@ -66,7 +66,6 @@ export function renderMovies(movies) {
   });
   gallery.innerHTML = htmlcode;
 }
-const body = document.querySelector('body');
 export const escKey = e => {
   if (e.key == 'Escape') {
     closeModal();
@@ -112,7 +111,9 @@ export const fetchMovieById = async id => {
   const data = await fetchById(id);
   if (data == undefined) return;
   let isWatched = false;
+  let isQueued = false;
   const getMovies = JSON.parse(localStorage.getItem('movies'));
+  const getMoviesQue = JSON.parse(localStorage.getItem('movies-que'));
   if (getMovies !== null) {
     getMovies.forEach(movie => {
       if (movie.id == id) {
@@ -120,11 +121,14 @@ export const fetchMovieById = async id => {
       }
     });
   }
+  if (getMoviesQue !== null) {
+    getMoviesQue.forEach(movie => {
+      if (movie.id == id) {
+        isQueued = true;
+      }
+    });
+  }
   movieTitle.textContent = data.original_title.toUpperCase();
-  // const results = document.querySelector('.results');
-  // const review = document.querySelector('.abouttext');
-  // const imgModal = document.querySelector('.img-modal');
-
   let movieGen = [];
   data.genres.forEach(element => {
     movieGen.push(' ' + element.name);
@@ -139,16 +143,27 @@ export const fetchMovieById = async id => {
   if (isWatched) {
     btnWatch.textContent = 'Remove';
     btnWatch.classList.add('watched');
-    spinerCont.classList.toggle('hidden');
-    return;
+  } else {
+    btnWatch.textContent = 'add to watched';
+    if (btnWatch.classList.contains('watched'))
+      btnWatch.classList.remove('watched');
   }
-  btnWatch.textContent = 'add to watched';
-  if (btnWatch.classList.contains('watched'))
-    btnWatch.classList.remove('watched');
+  if (isQueued) {
+    btnQueue.textContent = 'Remove';
+    btnQueue.classList.add('watched');
+  } else {
+    btnQueue.textContent = 'add to queue';
+    if (btnQueue.classList.contains('watched'))
+      btnQueue.classList.remove('watched');
+  }
   spinerCont.classList.toggle('hidden');
 };
 
-export async function btnWatched(movieId) {
+export async function reviewLocalStorage(movieId, type) {
+  let getMovies;
+  let key = '';
+  let text = '';
+  let btn;
   if (movieId == 0) return;
   const dataToSave = {};
   const data = await fetchById(movieId);
@@ -160,12 +175,22 @@ export async function btnWatched(movieId) {
   dataToSave.poster_path = data.poster_path;
   dataToSave.title = data.title;
 
-  const getMovies = JSON.parse(localStorage.getItem('movies'));
+  if (type == 'watched') {
+    getMovies = JSON.parse(localStorage.getItem('movies'));
+    key = 'movies';
+    btn = btnWatch;
+    text = 'watched';
+  } else if (type == 'queue') {
+    getMovies = JSON.parse(localStorage.getItem('movies-que'));
+    key = 'movies-que';
+    btn = btnQueue;
+    text = 'queue';
+  }
   let isInLocalStorage = false;
   if (getMovies == null) {
-    localStorage.setItem('movies', JSON.stringify([dataToSave]));
-    btnWatch.textContent = 'Remove';
-    btnWatch.classList.add('watched');
+    localStorage.setItem(key, JSON.stringify([dataToSave]));
+    btn.textContent = 'Remove';
+    btn.classList.add('watched');
     return;
   }
   getMovies.forEach(movie => {
@@ -173,15 +198,15 @@ export async function btnWatched(movieId) {
       isInLocalStorage = true;
       let index = getMovies.findIndex(elem => elem.id == dataToSave.id);
       getMovies.splice(index, 1);
-      localStorage.setItem('movies', JSON.stringify(getMovies));
-      btnWatch.textContent = 'add to watched';
-      btnWatch.classList.remove('watched');
+      localStorage.setItem(key, JSON.stringify(getMovies));
+      btn.textContent = `add to ${text}`;
+      btn.classList.remove('watched');
     }
   });
   if (!isInLocalStorage) {
     getMovies.push(dataToSave);
-    localStorage.setItem('movies', JSON.stringify(getMovies));
-    btnWatch.textContent = 'Remove';
-    btnWatch.classList.add('watched');
+    localStorage.setItem(key, JSON.stringify(getMovies));
+    btn.textContent = 'Remove';
+    btn.classList.add('watched');
   }
 }

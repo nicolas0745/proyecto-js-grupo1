@@ -186,27 +186,68 @@ ul {
 
 .btn-watched,
 .btn-queue {
-  width: 129.53px;
-  height: 44px;
-  border-radius: 5px;
-  color: white;
-  background-color: transparent;
-  border: 1px solid white;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
-  letter-spacing: 0em;
-  text-align: center;
-}
-
-.btn-watched:hover,
-.btn-queue:hover {
+  // width: 129.53px;
+  // height: 44px;
+  // border-radius: 5px;
+  // color: white;
+  // background-color: transparent;
+  // border: 1px solid white;
+  // font-size: 12px;
+  // font-weight: 500;
+  // line-height: 16px;
+  // letter-spacing: 0em;
+  // text-align: center;
+  min-width: 130px;
+  height: 40px;
+  color: #fff;
+  padding: 5px 10px;
+  font-weight: bold;
   cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  outline: none;
+  border-radius: 5px;
+  border: none;
+  box-shadow: inset 2px 2px 2px 0px rgba(216, 100, 5, 0.804),
+    7px 7px 20px 0px rgba(0, 0, 0, 0.1), 4px 4px 5px 0px rgba(0, 0, 0, 0.1);
+  background: transparent;
+  z-index: 1;
 }
 
-.btn-watched {
-  background-color: rgba(255, 107, 8, 1);
+.btn-watched:hover::after,
+.btn-queue:hover::after {
+  cursor: pointer;
+  width: 100%;
+  left: 0;
 }
+
+.active {
+  background-color: #f47d0e;
+}
+
+.btn-watched::after,
+.btn-queue::after {
+  border-radius: 5px;
+  position: absolute;
+  content: '';
+  width: 0;
+  height: 100%;
+  top: 0;
+  z-index: -1;
+  box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, 0.5),
+    7px 7px 20px 0px rgba(0, 0, 0, 0.1), 4px 4px 5px 0px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  background-color: #f47d0e;
+  right: 0;
+}
+.btn-queue:active,
+.btn-watched:active {
+  top: 2px;
+}
+// .btn-watched {
+//   background-color: rgba(255, 107, 8, 1);
+// }
 
 .btn-container {
   display: flex;
