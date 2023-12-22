@@ -11,10 +11,8 @@ let currentPage = 1;
 
 export function paginationLT(totalItems, currentPage) {
   const totalPages = Math.ceil(totalItems / 20);
-  console.log(totalItems + 'total items');
   totalPag2 = totalPages;
   const pagination = [];
-  console.log(totalPages + 'totalpages');
   if (totalPages <= 9) {
     for (let i = 1; i <= totalPages; i++) {
       pagination.push(i);
@@ -38,7 +36,5 @@ export function paginationLT(totalItems, currentPage) {
     if (currentPage < totalPages - 2) pagination.push('...');
     pagination.push(totalPages);
   }
-  console.log(pagination + 'pagination');
-
   return pagination;
 }

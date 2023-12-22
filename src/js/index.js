@@ -1,15 +1,16 @@
-import { getTrending, fetchBySearch, fetchById } from './fetch-functions';
+import { getTrending, fetchBySearch } from './fetch-functions';
 import {
   renderMovies,
   enableModal,
   fetchMovieById,
-  btnWatched,
+  escKey,
+  reviewLocalStorage,
 } from './functions';
-import { paginationLT } from './pagination-function';
 
-localStorage.removeItem('total-results-from-search');
+localStorage.removeItem('total-results-from-search'); //en review
 const gallery = document.querySelector('.gallery');
 const btnWatch = document.querySelector('.watch');
+const btnQueue = document.querySelector('.queue');
 const btnSubmit = document.querySelector('.btn');
 const inputSearch = document.querySelector('.input');
 const loader = document.querySelector('.spiner-cont');
@@ -21,7 +22,6 @@ export let string = '';
 let totalPageSearch = 0;
 let page = 1;
 let pageSearch = 1;
-console.log(JSON.parse(localStorage.getItem('movies')));
 
 const getTrendingMovies = async () => {
   loader.classList.toggle('hidden');
@@ -30,17 +30,17 @@ const getTrendingMovies = async () => {
   const { results: movies, total_pages } = data;
 
   renderMovies(movies);
-  loader.classList.toggle('hidden');
   enableModal(false);
 
   gallery.addEventListener('click', e => {
-    movieId = e.target.id;
-
-    //tenemos el id de la imagen seleccionada
-    if (movieId != '') {
+    if (e.target.nodeName == 'IMG') {
+      movieId = e.target.id;
       fetchMovieById(movieId);
+      document.addEventListener('keyup', escKey);
     }
   });
+
+  loader.classList.toggle('hidden');
 };
 
 btnSubmit.addEventListener('click', async e => {
@@ -63,7 +63,10 @@ btnSubmit.addEventListener('click', async e => {
 });
 
 btnWatch.addEventListener('click', () => {
-  btnWatched(movieId);
+  reviewLocalStorage(movieId, 'watched');
 });
 
+btnQueue.addEventListener('click', () => {
+  reviewLocalStorage(movieId, 'queue');
+});
 getTrendingMovies();

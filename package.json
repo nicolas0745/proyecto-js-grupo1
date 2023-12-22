@@ -21,6 +21,7 @@
     "axios": "^1.6.2",
     "caniuse-lite": "^1.0.30001568",
     "modern-normalize": "^1.1.0",
+    "node-sass": "^9.0.0",
     "pagination-layout": "^1.1.0"
   },
   "devDependencies": {

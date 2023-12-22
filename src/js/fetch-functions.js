@@ -39,6 +39,14 @@ export async function fetchBySearch(query, page) {
         Accept: 'application/json',
       },
     });
+    const failText = document.querySelector('.fail-text');
+
+    if (response.data.results.length == 0) {
+      failText.style.display = 'block';
+    } else {
+      failText.style.display = 'none';
+    }
+
     if (!response.statusText == 'OK') throw new Error('Response Failed');
     const data = response.data;
     return data;
