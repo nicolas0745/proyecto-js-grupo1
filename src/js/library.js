@@ -66,6 +66,7 @@ const renderQueLocal = param => {
 };
 
 btnQ.addEventListener('click', e => {
+  gallery.innerHTML = '';
   currentPage = 1;
   btnQ.classList.add('active');
   btnW.classList.remove('active');
@@ -74,6 +75,7 @@ btnQ.addEventListener('click', e => {
 });
 
 btnW.addEventListener('click', () => {
+  gallery.innerHTML = '';
   currentPage = 1;
   btnW.classList.add('active');
   btnQ.classList.remove('active');
